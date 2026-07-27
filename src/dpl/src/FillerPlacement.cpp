@@ -115,18 +115,7 @@ void Opendp::setGridCells()
 // site.
 std::pair<dbSite*, dbOrientType> Opendp::fillSite(Pixel* pixel)
 {
-  dbSite* selected_site = nullptr;
-  dbOrientType selected_orient;
-  DbuY min_height{std::numeric_limits<int>::max()};
-  for (const auto& [site, orient] : pixel->sites) {
-    DbuY site_height{site->getHeight()};
-    if (site_height < min_height) {
-      min_height = site_height;
-      selected_site = site;
-      selected_orient = orient;
-    }
-  }
-  return {selected_site, selected_orient};
+  return {pixel->site, pixel->site_orient};
 }
 
 void Opendp::placeRowFillers(GridY row,

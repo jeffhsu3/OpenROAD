@@ -36,10 +36,18 @@ struct Pixel
   Node* cell = nullptr;
   Group* group = nullptr;
   double util = 0.0;
+  // Site/orient of the row overlaying this pixel, stored inline. Upstream
+  // used std::map<dbSite*, dbOrientType> here: 48B/pixel when empty plus a
+  // heap node per entry, which is fatal at ~1.4e9 pixels on large dies.
+  // Hybrid-row PDKs with multiple distinct sites per pixel keep only the
+  // last row's site; single-site PDKs (e.g. ASAP7) are unaffected.
+  dbSite* site = nullptr;
+  dbOrientType site_orient;
   bool is_valid = false;     // false for dummy cells
   bool is_hopeless = false;  // too far from sites for diamond search
-  std::map<dbSite*, dbOrientType> sites;
   uint8_t blocked_layers = 0;
+
+  bool hasSite(const dbSite* s) const { return s != nullptr && site == s; }
 };
 
 // Return value for grid searches.

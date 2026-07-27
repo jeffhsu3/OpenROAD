@@ -71,6 +71,8 @@ void Grid::allocateGrid()
       pixel.cell = nullptr;
       pixel.group = nullptr;
       pixel.util = 0.0;
+      pixel.site = nullptr;
+      pixel.site_orient = dbOrientType();
       pixel.is_valid = false;
       pixel.is_hopeless = false;
       pixel.blocked_layers = 0;
@@ -101,7 +103,8 @@ void Grid::markHopeless(dbBlock* block,
     for (GridX x{x_start}; x < x_end; x++) {
       Pixel* pixel = gridPixel(x, y_row);
       pixel->is_valid = true;
-      pixel->sites[db_row->getSite()] = db_row->getOrient();
+      pixel->site = db_row->getSite();
+      pixel->site_orient = db_row->getOrient();
     }
 
     // The safety margin is to avoid having only a very few sites

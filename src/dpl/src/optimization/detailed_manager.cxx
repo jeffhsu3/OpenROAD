@@ -2984,7 +2984,6 @@ void DetailedMgr::paintInGrid(Node* node)
   const auto grid_y = grid_->gridSnapDownY(node);
   auto pixel = grid_->gridPixel(grid_x, grid_y);
   grid_->paintPixel(node, grid_x, grid_y);
-  node->adjustCurrOrient(
-      pixel->sites.at(node->getDbInst()->getMaster()->getSite()));
+  node->adjustCurrOrient(pixel->site_orient);
 }
 }  // namespace dpl
