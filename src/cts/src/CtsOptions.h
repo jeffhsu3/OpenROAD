@@ -373,7 +373,11 @@ class CtsOptions : public odb::dbBlockCallBackObj
   int slewSteps_ = 7;
   unsigned charWirelengthIterations_ = 4;
   double sinkBufferInputCap_ = 0;
-  unsigned clockTreeMaxDepth_ = 100;
+  // Emergency ceiling: 2^16 sub-regions x ~30 sinks/cluster covers ~2M
+  // clustered sinks; depth 100 lets a missed stop criterion double the
+  // topology into the billions of nodes and OOM (chipforge local patch,
+  // override via -clock_tree_max_depth / CTS_CLOCK_TREE_MAX_DEPTH).
+  unsigned clockTreeMaxDepth_ = 16;
   bool enableFakeLutEntries_ = true;
   bool forceBuffersOnLeafLevel_ = true;
   double bufDistRatio_ = 0.1;

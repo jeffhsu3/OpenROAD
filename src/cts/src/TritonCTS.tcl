@@ -405,6 +405,7 @@ sta::define_cmd_args "clock_tree_synthesis" {[-wire_unit unit]
                                              [-dont_use_dummy_load] \
                                              [-delay_buffer_derate] \
                                              [-library] \
+                                             [-clock_tree_max_depth depth] \
                                              [-repair_clock_nets] \
                                              [-no_insertion_delay]
 }
@@ -419,7 +420,8 @@ proc clock_tree_synthesis { args } {
           -macro_clustering_size -macro_clustering_max_diameter \
           -sink_clustering_levels -tree_buf \
           -apply_ndr \
-          -sink_buffer_max_cap_derate -delay_buffer_derate -library} \
+          -sink_buffer_max_cap_derate -delay_buffer_derate -library \
+          -clock_tree_max_depth} \
     flags {-post_cts_disable -sink_clustering_enable -balance_levels \
            -obstruction_aware -no_obstruction_aware \
            -dont_use_dummy_load -repair_clock_nets -no_insertion_delay
@@ -430,6 +432,24 @@ proc clock_tree_synthesis { args } {
   if { [info exists keys(-library)] } {
     set cts_library $keys(-library)
     cts::set_cts_library $cts_library
+  }
+
+  # Cap on H-tree topology depth (each level doubles the topology). Explicit
+  # option wins; CTS_CLOCK_TREE_MAX_DEPTH env var lets wrapper flows (e.g.
+  # SiliconCompiler) set it without changing their scripts.
+  if { [info exists keys(-clock_tree_max_depth)] } {
+    set depth $keys(-clock_tree_max_depth)
+    if { !([string is integer -strict $depth] && $depth >= 1) } {
+      utl::error CTS 138 "-clock_tree_max_depth must be a positive integer."
+    }
+    cts::set_clock_tree_max_depth $depth
+  } elseif { [info exists ::env(CTS_CLOCK_TREE_MAX_DEPTH)] } {
+    set depth $::env(CTS_CLOCK_TREE_MAX_DEPTH)
+    if { !([string is integer -strict $depth] && $depth >= 1) } {
+      utl::error CTS 139 "CTS_CLOCK_TREE_MAX_DEPTH must be a positive integer."
+    }
+    utl::info CTS 141 "Using clock_tree_max_depth=$depth from environment."
+    cts::set_clock_tree_max_depth $depth
   }
 
   if { [info exists flags(-post_cts_disable)] } {

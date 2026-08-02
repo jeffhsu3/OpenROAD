@@ -193,6 +193,12 @@ set_num_static_layers(unsigned num)
 }
 
 void
+set_clock_tree_max_depth(unsigned depth)
+{
+  getTritonCts()->getParms()->setClockTreeMaxDepth(depth);
+}
+
+void
 set_sink_buffer(const char* buffer)
 {
   getTritonCts()->setSinkBuffer(buffer);

@@ -1269,6 +1269,18 @@ void HTreeBuilder::run()
     computeLevelTopology(level, regionWidth, regionHeight);
 
     if (isNumberOfSinksTooSmall(numSinksPerSubRegion)) {
+      if (numSinksPerSubRegion <= 1) {
+        // Meaningful-progress guard: with at most one sink per sub-region,
+        // deeper levels cannot reduce fanout or sink-region HPWL any
+        // further; they only double the topology (runaway toward
+        // clockTreeMaxDepth_ and OOM on large flat netlists).
+        logger_->info(CTS,
+                      140,
+                      " Stop criterion found. Sinks per sub-region is {}; "
+                      "deeper levels cannot improve the tree.",
+                      numSinksPerSubRegion);
+        break;
+      }
       if (options_->getMaxWl()) {
         double maxHPWL = topologyForEachLevel_.back().getLargestSinkRegionHPWL(
             wireSegmentUnit_);
